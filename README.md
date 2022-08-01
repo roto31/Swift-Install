@@ -1,4 +1,7 @@
 # Swift-Install
+
+
+
 swiftDialog and Installomater based workflow to install applications.
 
 I currently use JumpCloud MDM to manage the Macs I have in my house. JumpCloud does not have a Self-Service option to install applications and all applications need to be pushed via the MDM. But what if you or one of your users, if you are in an org, want to install an approved application, you cannot. 
