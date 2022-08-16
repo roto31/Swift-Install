@@ -14,4 +14,5 @@ The main requirements are [swiftDialog](https://github.com/bartreardon/swiftDial
 Wiki [Here](https://github.com/roto31/Swift-Install/wiki)
 
 *credits to the Installomater project
+
 *credits to Bart Reardon for swiftDialog
