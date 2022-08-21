@@ -1,6 +1,7 @@
 # Swift-Install
 
-<img width="826" alt="Screen Shot 2022-07-31 at 8 45 13 PM" src="https://user-images.githubusercontent.com/47955141/182061169-84aa76da-aa5e-4d81-abe3-8c9376925020.png">
+<img width="619" alt="Screen Shot 2022-08-21 at 5 15 25 PM" src="https://user-images.githubusercontent.com/47955141/185811290-ce763826-cf17-46e9-bc99-4937115bfe74.png">
+
 
 
 swiftDialog and Installomater based workflow to install applications.
