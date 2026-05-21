@@ -34,6 +34,12 @@ shopt -s extglob
 
 #Variables
 dialogApp="/usr/local/bin/dialog"
+
+if [[ ! -e $dialogApp ]]; then
+	echo "Dialog not found at path $dialogApp"
+	exit 1
+fi
+
 title="Select Your Application"
 message="The below applications are available to install for your computer. Please select from drop down below"
 icon="/System/Applications/App Store.app/Contents/Resources/AppIcon.icns"
@@ -53,6 +59,12 @@ while [[ -z $application ]]; do
 		--moveable \
 		--small \
 		--selectvalues "$selectvalues")
+	
+	if [[ "$result" == *"button2"* ]] || [[ -z "$result" ]]; then
+		echo "User cancelled or no application selected"
+		exit 0
+	fi
+	
 	application=$(grep "$selecttitle :" <<< "$result" | awk -F " : " '{print $NF}')
 done
 
@@ -72,8 +84,6 @@ labels=(
 # ©2022 Bart Reardon
 
 # List of Installomator labels to process
-#)    $application
-#)
 
 
 # -------------------------------------
@@ -81,8 +91,8 @@ labels=(
 # *** script variables
 
 # location of dialog and installomator scripts
-dialogApp="/usr/local/bin/dialog"
 dialog_command_file="/var/tmp/dialog.log"
+: > "$dialog_command_file"
 installomator="/usr/local/Installomator/Installomator.sh"
 
 
@@ -102,19 +112,18 @@ fi
 
 # take an installomator label and output the full app name
 function label_to_name(){
-	#name=$(grep -A2 "${1})" "$installomator" | grep "name=" | head -1 | cut -d '"' -f2) # pre Installomator 9.0
-	name=$(${installomator} ${1} RETURN_LABEL_NAME=1 LOGGING=REQ | tail -1)
+	name=$("${installomator}" "${1}" RETURN_LABEL_NAME=1 LOGGING=REQ | tail -1)
 	if [[ "$name" != "#" ]]; then
-		echo $name
+		echo "$name"
 	else
-		echo $1
+		echo "$1"
 	fi
 }
 
 # execute a dialog command
 function dialog_command(){
-	echo $1
-	echo $1  >> $dialog_command_file
+	echo "$1"
+	echo "$1"  >> "$dialog_command_file"
 }
 
 function finalise(){
@@ -130,7 +139,7 @@ function finalise(){
 
 output_steps_per_app=30
 number_of_apps=${#labels[@]}
-progress_total=$(( $output_steps_per_app ))
+progress_total=$(( $output_steps_per_app * $number_of_apps ))
 
 
 # initial dialog starting arguments
@@ -158,15 +167,14 @@ dialogCMD="$dialogApp -p --title \"$title\" \
 # create the list of labels
 listitems=""
 for label in "${labels[@]}"; do
-	#echo "apps label is $label"
-	appname=$(label_to_name $label)
-  listitems="$listitems --listitem \"${appname}\" "
+	appname=$(label_to_name "$label")
+   listitems="$listitems --listitem \"${appname}\" "
 done
 
 # final command to execute
 dialogCMD="$dialogCMD $listitems"
 
-echo $dialogCMD
+echo "$dialogCMD"
 # Launch dialog and run it in the background sleep for a second to let thing initialise
 eval $dialogCMD &
 sleep 2
@@ -179,7 +187,7 @@ progress_index=0
 for label in "${labels[@]}"; do
 	step_progress=$(( $output_steps_per_app * $progress_index ))
 	dialog_command "progress: $step_progress"
-	appname=$(label_to_name $label | tr -d "\"")
+	appname=$(label_to_name "$label" | tr -d "\"")
 	dialog_command "listitem: $appname: wait"
 	dialog_command "progresstext: Installing $label"
 	installomator_error=0
